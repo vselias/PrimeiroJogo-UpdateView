@@ -59,6 +59,7 @@ import javax.swing.border.EmptyBorder;
 
 import jaco.mp3.player.MP3Player;
 import javax.swing.JRadioButtonMenuItem;
+import javax.swing.JRootPane;
 import javax.swing.KeyStroke;
 import java.awt.event.InputEvent;
 
@@ -74,6 +75,7 @@ public class TesteJogo extends JFrame {
 	private JMenu menuJogo;
 	private JMenuItem menuItemJogar;
 	int lastX, lastY;
+	int pX = 0, pY = 0;
 	private JRadioButtonMenuItem rdPausarJogo;
 	private JMenu menuInfo;
 	private JMenuItem mntmNewMenuItem;
@@ -89,6 +91,8 @@ public class TesteJogo extends JFrame {
 	private final static int PAH_WIDTH = 65;
 	private final static int PAH_HEIGHT = 65;
 	boolean entrou = false;
+	int xMoved = 0;
+	int yMoved = 0;
 	private int frameWidth = 848;
 	static TesteJogo frame;
 	private float velocidadeSacola = 20;
@@ -116,6 +120,7 @@ public class TesteJogo extends JFrame {
 	private Rectangle recMouse = new Rectangle();
 	private Retangulo recSacola = new Retangulo();
 	private JCheckBoxMenuItem chckbxmntmNewCheckItem;
+	int w = 0, h = 0;
 
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
@@ -135,6 +140,75 @@ public class TesteJogo extends JFrame {
 	 */
 	public TesteJogo() {
 
+		addMouseMotionListener(new MouseMotionAdapter() {
+			@Override
+			public void mouseDragged(MouseEvent e) {
+				w = frame.getWidth();
+				h = frame.getHeight();
+				System.out.println(
+						" e.x " + e.getX() + " w " + getWidth() + " e.y " + e.getY() + " height " + getHeight());
+
+				System.out.println("xOnScreen " + e.getXOnScreen() + " yOnScreen " + e.getYOnScreen());
+
+				setMaximumSize(new Dimension(1920, 1080));
+				if (frame.getCursor().getType() == Cursor.SW_RESIZE_CURSOR) {
+					int width = frame.getWidth() + e.getXOnScreen();
+					int height = frame.getHeight() + e.getXOnScreen();
+
+					if (pY > e.getY() && pX < e.getX()) {
+						h -= 5;
+						w -= 10;
+					} else {
+						h += 5;
+						w += 10;
+					}
+
+				}
+
+				setSize(w, h);
+			}
+
+			@Override
+			public void mouseMoved(MouseEvent e) {
+
+				xMoved = e.getX();
+				yMoved = e.getY();
+//				System.out.println("X " + xMoved + " Y " + yMoved);
+				if (xMoved <= 11 && yMoved >= frame.getHeight() - 20) {
+					frame.setCursor(new Cursor(Cursor.SW_RESIZE_CURSOR));
+				} else {
+					frame.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+					System.out.println("senao cursor");
+
+				}
+
+//				} else if (xMoved >= contentPane.getWidth() - 11 && yMoved > contentPane.getHeight() - 20) {
+//					contentPane.setCursor(new Cursor(Cursor.SE_RESIZE_CURSOR));
+//					System.out.println("entrou! c.H" + contentPane.getHeight());
+//				} else if (yMoved >= contentPane.getHeight() - 5) {
+//					contentPane.setCursor(new Cursor(Cursor.S_RESIZE_CURSOR));
+//				} else if (xMoved <= 5) {
+//					contentPane.setCursor(new Cursor(Cursor.W_RESIZE_CURSOR));
+//				} else if (xMoved >= contentPane.getWidth() - 5) {
+//					contentPane.setCursor(new Cursor(Cursor.E_RESIZE_CURSOR));
+//				} else {
+//					contentPane.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+//				}
+			}
+		});
+		addMouseListener(new MouseAdapter() {
+			@Override
+			public void mousePressed(MouseEvent e) {
+				pX = e.getX();
+				pY = e.getY();
+				System.out.println("Mouse pressed x " + pX + " Mouse pressed y " + pY);
+			}
+
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				System.out.println("tamanho w " + w + " h " + h);
+			}
+		});
 		addComponentListener(new ComponentAdapter() {
 			@Override
 			public void componentMoved(ComponentEvent e) {
@@ -184,6 +258,7 @@ public class TesteJogo extends JFrame {
 		setFocusable(true);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setSize(1000, 600);
+		getRootPane().setBorder(BorderFactory.createMatteBorder(10, 10, 10, 10, Color.GRAY));
 		setLocationRelativeTo(null);
 		menu = new JMenuBar();
 		menu.addMouseMotionListener(new MouseMotionAdapter() {
@@ -301,33 +376,56 @@ public class TesteJogo extends JFrame {
 			}
 
 		};
-		contentPane.setSize(935, 935);
-		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		contentPane.addMouseListener(new MouseAdapter() {
-
 			@Override
 			public void mousePressed(MouseEvent e) {
-
 				lastX = e.getX();
 				lastY = e.getY();
 			}
+
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				if (selectedMouse) {
+					contentPane.setCursor(new Cursor(Cursor.CROSSHAIR_CURSOR));
+				} else {
+					contentPane.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+				}
+
+			}
 		});
+		contentPane.setSize(935, 935);
+		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		contentPane.addMouseMotionListener(new MouseMotionAdapter() {
 			@Override
 			public void mouseDragged(MouseEvent e) {
-				int xOnScreen = e.getXOnScreen();
-				int yOnScreen = e.getYOnScreen();
-				setSize(e.getXOnScreen() + (e.getX() - lastX), e.getYOnScreen() + (e.getY() - lastY));
-				if (selectedMouse) {
-					removerPah();
+
+//				int xOnScreen = e.getXOnScreen();
+//				int yOnScreen = e.getYOnScreen();
+//				setSize(e.getXOnScreen() + (e.getX() - lastX), e.getYOnScreen() + (e.getY() - lastY));
+//				if (selectedMouse) {
+//					removerPah();
+//				} else {
+//					moverPah();
+//				}
+			}
+
+			@Override
+			public void mouseMoved(MouseEvent e) {
+				int xMoved = e.getX();
+				int yMoved = e.getY();
+				if (xMoved <= 11 && yMoved >= frame.getHeight() - 20) {
+					frame.setCursor(new Cursor(Cursor.SW_RESIZE_CURSOR));
 				} else {
-					moverPah();
+					frame.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+					System.out.println("senao cursor");
+
 				}
+
 			}
 		});
 
-		JPanel panel_1 = new JPanel();
-		panel_1.setOpaque(false);
+		JPanel panelPts = new JPanel();
+		panelPts.setBackground(new Color(99, 102, 106, 85));
 
 		JPanel panel = new JPanel();
 		panel.setOpaque(false);
@@ -336,13 +434,13 @@ public class TesteJogo extends JFrame {
 		gl_contentPane
 				.setHorizontalGroup(gl_contentPane.createParallelGroup(Alignment.TRAILING).addGroup(Alignment.LEADING,
 						gl_contentPane.createSequentialGroup()
-								.addComponent(panel_1, GroupLayout.PREFERRED_SIZE, 136, GroupLayout.PREFERRED_SIZE)
+								.addComponent(panelPts, GroupLayout.PREFERRED_SIZE, 136, GroupLayout.PREFERRED_SIZE)
 								.addPreferredGap(ComponentPlacement.RELATED, 570, Short.MAX_VALUE)
 								.addComponent(panel, GroupLayout.PREFERRED_SIZE, 118, GroupLayout.PREFERRED_SIZE)));
 		gl_contentPane.setVerticalGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_contentPane.createSequentialGroup()
 						.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
-								.addComponent(panel_1, GroupLayout.PREFERRED_SIZE, 165, GroupLayout.PREFERRED_SIZE)
+								.addComponent(panelPts, GroupLayout.PREFERRED_SIZE, 165, GroupLayout.PREFERRED_SIZE)
 								.addComponent(panel, GroupLayout.PREFERRED_SIZE, 37, GroupLayout.PREFERRED_SIZE))
 						.addContainerGap(426, Short.MAX_VALUE)));
 
@@ -368,11 +466,13 @@ public class TesteJogo extends JFrame {
 			@Override
 			public void mouseEntered(MouseEvent e) {
 				lblClose.setBackground(Color.red);
+				contentPane.setCursor(new Cursor(Cursor.HAND_CURSOR));
 			}
 
 			@Override
 			public void mouseExited(MouseEvent e) {
 				lblClose.setBackground(Color.GRAY);
+				contentPane.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 			}
 		});
 
@@ -389,11 +489,13 @@ public class TesteJogo extends JFrame {
 			@Override
 			public void mouseEntered(MouseEvent e) {
 				lblMinimize.setBackground(Color.green);
+				contentPane.setCursor(new Cursor(Cursor.HAND_CURSOR));
 			}
 
 			@Override
 			public void mouseExited(MouseEvent e) {
 				lblMinimize.setBackground(Color.GRAY);
+				contentPane.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 			}
 		});
 		lblMinimize.setHorizontalAlignment(SwingConstants.CENTER);
@@ -416,47 +518,55 @@ public class TesteJogo extends JFrame {
 
 		lblTempSacola = new JLabel("Tempo:" + tempNovaSacola);
 		lblTempSacola.setFont(new Font("Dialog", Font.BOLD, 14));
-		lblTempSacola.setForeground(Color.LIGHT_GRAY);
+		lblTempSacola.setForeground(Color.ORANGE);
 
 		lblVelocidadeSacola = new JLabel("Velocidade: " + velocidadeSacola);
 		lblVelocidadeSacola.setFont(new Font("Dialog", Font.BOLD, 14));
-		lblVelocidadeSacola.setForeground(Color.LIGHT_GRAY);
+		lblVelocidadeSacola.setForeground(Color.ORANGE);
 
 		labelVidas = new JLabel("Vidas: 3");
-		labelVidas.setForeground(Color.LIGHT_GRAY);
+		labelVidas.setForeground(Color.ORANGE);
 		labelVidas.setFont(new Font("Dialog", Font.BOLD, 14));
 
 		lblLevel = new JLabel("Nível: 0");
-		lblLevel.setForeground(Color.LIGHT_GRAY);
+		lblLevel.setForeground(Color.ORANGE);
 		lblLevel.setFont(new Font("Dialog", Font.BOLD, 14));
 
 		labelPts = new JLabel("Pontos: 0");
-		labelPts.setForeground(Color.LIGHT_GRAY);
+		labelPts.setForeground(Color.ORANGE);
 		labelPts.setFont(new Font("Dialog", Font.BOLD, 14));
-		GroupLayout gl_panel_1 = new GroupLayout(panel_1);
-		gl_panel_1.setHorizontalGroup(gl_panel_1.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_panel_1.createSequentialGroup().addContainerGap()
-						.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING)
+		GroupLayout gl_panelPts = new GroupLayout(panelPts);
+		gl_panelPts.setHorizontalGroup(gl_panelPts.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_panelPts.createSequentialGroup().addContainerGap()
+						.addGroup(gl_panelPts.createParallelGroup(Alignment.LEADING)
 								.addComponent(lblTempSacola, GroupLayout.DEFAULT_SIZE, 130, Short.MAX_VALUE)
 								.addComponent(lblVelocidadeSacola, GroupLayout.DEFAULT_SIZE, 130, Short.MAX_VALUE)
 								.addComponent(labelPts, GroupLayout.DEFAULT_SIZE, 115, Short.MAX_VALUE)
 								.addComponent(labelVidas, GroupLayout.DEFAULT_SIZE, 115, Short.MAX_VALUE)
 								.addComponent(lblLevel, GroupLayout.DEFAULT_SIZE, 115, Short.MAX_VALUE))
 						.addContainerGap()));
-		gl_panel_1.setVerticalGroup(gl_panel_1.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_panel_1.createSequentialGroup().addContainerGap().addComponent(lblTempSacola)
+		gl_panelPts.setVerticalGroup(gl_panelPts.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_panelPts.createSequentialGroup().addContainerGap().addComponent(lblTempSacola)
 						.addPreferredGap(ComponentPlacement.UNRELATED).addComponent(lblVelocidadeSacola)
 						.addPreferredGap(ComponentPlacement.UNRELATED).addComponent(labelPts)
 						.addPreferredGap(ComponentPlacement.UNRELATED).addComponent(labelVidas)
 						.addPreferredGap(ComponentPlacement.UNRELATED).addComponent(lblLevel)
 						.addContainerGap(104, Short.MAX_VALUE)));
-		panel_1.setLayout(gl_panel_1);
+		panelPts.setLayout(gl_panelPts);
 		contentPane.setLayout(gl_contentPane);
 
 		setContentPane(contentPane);
 		carregarThreadGame();
 		playSongControlVol("songs/song.mp3", -10f);
 		definirPosicaoRetanguloImpacto();
+	}
+
+	@Override
+	public void setVisible(boolean b) {
+		// TODO Auto-generated method stub
+		super.setVisible(b);
+		w = getWidth();
+		h = getHeight();
 	}
 
 	protected void moverPah() {
@@ -489,12 +599,12 @@ public class TesteJogo extends JFrame {
 		if (!desativarLVL) {
 			if (pts > 0 && pts != valorEncontrado) {
 
-				if (velocidadeSacola > 3.5 && pts != valorEncontrado) {
+				if (velocidadeSacola > 5 && pts != valorEncontrado) {
 					levelGame += 1;
 					lblLevel.setText("Nivel: " + levelGame);
 					velocidadeSacola -= (0.3 * velocidadeSacola);
 				}
-				if (tempNovaSacola > (700) && pts != valorEncontrado) {
+				if (tempNovaSacola > (300) && pts != valorEncontrado) {
 					tempNovaSacola -= (0.3 * tempNovaSacola);
 				}
 				valorEncontrado = pts;
@@ -601,6 +711,7 @@ public class TesteJogo extends JFrame {
 
 	}
 
+	@Deprecated
 	public JLabel encontrarSacolaDif(JLabel sacolaEncontrada, Iterator<Component> iterator) {
 
 		for (Iterator iter = iterator; iter.hasNext();) {
@@ -644,6 +755,7 @@ public class TesteJogo extends JFrame {
 		// adicionarInfoPts();
 	}
 
+	@Deprecated
 	private void definirPontuacaoMouse(int qtd) throws InterruptedException {
 		pts += qtd * 10;
 		labelPts.setText("Pontos: " + pts);
@@ -655,11 +767,13 @@ public class TesteJogo extends JFrame {
 		threadExplosao = new Thread(() -> {
 			try {
 
-				JLabel explosao = new JLabel();
+				JButton explosao = new JButton();
 				explosao.setIcon(new ImageIcon("src/explosao.png"));
-				explosao.setBounds(pah.getX() - pah.getWidth(), pah.getY() - 15, 64, 64);
+				explosao.setBounds(pah.getX(), pah.getY(), 64, 64);
+				explosao.setContentAreaFilled(false);
+				explosao.setBorderPainted(false);
 				contentPane.add(explosao);
-				Thread.sleep(20);
+				Thread.sleep(40);
 				contentPane.remove(explosao);
 				explosao = null;
 				playSong("songs/saco-estouro.mpeg");
@@ -673,18 +787,21 @@ public class TesteJogo extends JFrame {
 
 	}
 
-	private void criarExplosaoImpactoMouse(int x, int y) throws InterruptedException {
+	private void criarExplosaoImpactoMouse() throws InterruptedException {
 
 		threadExplosaoMouse = new Thread(() -> {
 			try {
-				JLabel explosao = new JLabel();
-				explosao.setIcon(new ImageIcon("src/explosao.png"));
-				explosao.setSize(54, 54);
-				explosao.setBounds(mouseX - 70, mouseY - 70, 54, 54);
-				explosao.setFocusable(false);
+				JButton explosao = new JButton();
+				ImageIcon icon = new ImageIcon("src/explosao.png");
+				Image image = icon.getImage();
+				Image scaledInstance = image.getScaledInstance(52, 52, Image.SCALE_DEFAULT);
+				explosao.setIcon(new ImageIcon(scaledInstance));
+				explosao.setContentAreaFilled(false);
+				explosao.setBorderPainted(false);
+				explosao.setBounds(mouseX, mouseY, 52, 52);
 				contentPane.add(explosao);
-				// playSong("songs/saco-estouro.mpeg");
-				Thread.sleep(20);
+				playSong("songs/saco-estouro.mpeg");
+				Thread.sleep(40);
 				contentPane.remove(explosao);
 				explosao = null;
 				refreshPanel();
@@ -697,6 +814,7 @@ public class TesteJogo extends JFrame {
 
 	}
 
+	@Deprecated
 	private void adicionarInfoPts() throws InterruptedException {
 		JLabel pontos = new JLabel();
 		pontos.setIcon(new ImageIcon("src/10pts.png"));
@@ -721,6 +839,8 @@ public class TesteJogo extends JFrame {
 		refreshPanel();
 	}
 
+	@Deprecated
+	// antigo remover usando lista com retangulo
 	private void removerSacolaImpactoMouse(JLabel tSacola) {
 		try {
 			System.out.println("sacola removida " + sacola.getText());
@@ -830,7 +950,7 @@ public class TesteJogo extends JFrame {
 			sac = null;
 			System.gc();
 			refreshPanel();
-			System.out.println("Chamou o metodo de remover sacolas nao estouradas!");
+//			System.out.println("Chamou o metodo de remover sacolas nao estouradas!");
 		}
 	}
 
@@ -855,6 +975,7 @@ public class TesteJogo extends JFrame {
 		refreshPanel();
 	}
 
+	@Deprecated
 	public void removerSacolasPerdidasIterator(Iterator<JLabel> iterator) {
 
 		while (iterator.hasNext()) {
@@ -937,6 +1058,7 @@ public class TesteJogo extends JFrame {
 
 	}
 
+	@Deprecated
 	public void desativarSacola(JLabel tSacola, Rectangle recSacola) {
 		recSacola = new Rectangle();
 		recSacola.setBounds(0, 0, 0, 0);
@@ -995,7 +1117,6 @@ public class TesteJogo extends JFrame {
 
 	private void resizeImgPanel() {
 		Image img = Toolkit.getDefaultToolkit().getImage(TesteJogo.class.getResource("jogo3.png"));
-		System.out.println("pane w " + contentPane.getWidth() + " pane h " + contentPane.getWidth());
 		Image scaledInstance = img.getScaledInstance(contentPane.getWidth(), contentPane.getHeight(),
 				Image.SCALE_DEFAULT);
 
@@ -1003,6 +1124,7 @@ public class TesteJogo extends JFrame {
 		graphics.drawImage(scaledInstance, 0, 0, contentPane.getWidth(), contentPane.getHeight(), contentPane);
 	}
 
+	@Deprecated
 	private void desativarCirculoMouse() {
 		Graphics g = contentPane.getGraphics();
 		g.drawOval(mouseX = -500, mouseY = -500, 0, 0);
@@ -1096,7 +1218,8 @@ public class TesteJogo extends JFrame {
 							if (recMouse.intersects(recSacola) && !selectedPause) {
 								removerSacolaImpacto(tSacola);
 								definirPontuacao();
-								criarExplosaoImpactoMouse(mouseX, mouseY);
+								recSacola = new Retangulo();
+								criarExplosaoImpactoMouse();
 								refreshPanel();
 								break;
 							} else {
@@ -1105,7 +1228,6 @@ public class TesteJogo extends JFrame {
 
 						}
 					}
-					Thread.sleep(500);
 				} catch (Exception e1) {
 					e1.printStackTrace();
 				}
@@ -1115,5 +1237,4 @@ public class TesteJogo extends JFrame {
 
 		}
 	};
-
 }

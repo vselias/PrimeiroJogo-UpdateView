@@ -13,7 +13,6 @@ import javax.swing.JTextArea;
 import java.awt.Font;
 
 public class DialogInfo extends JDialog {
-	private JPanel buttonPane;
 
 	/**
 	 * Launch the application.
@@ -34,31 +33,15 @@ public class DialogInfo extends JDialog {
 	public DialogInfo() {
 		setResizable(false);
 		setTitle("Informações do jogo");
-		setBounds(100, 100, 682, 458);
-		{
-			buttonPane = new JPanel();
-			buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
-			{
-				JButton okButton = new JButton("OK");
-				okButton.setActionCommand("OK");
-				buttonPane.add(okButton);
-				getRootPane().setDefaultButton(okButton);
-			}
-			{
-				JButton cancelButton = new JButton("Cancel");
-				cancelButton.setActionCommand("Cancel");
-				buttonPane.add(cancelButton);
-			}
-		}
+		setBounds(100, 100, 763, 459);
 		
 		JScrollPane scrollPane = new JScrollPane();
 		GroupLayout groupLayout = new GroupLayout(getContentPane());
 		groupLayout.setHorizontalGroup(
 			groupLayout.createParallelGroup(Alignment.LEADING)
-				.addComponent(buttonPane, GroupLayout.PREFERRED_SIZE, 567, GroupLayout.PREFERRED_SIZE)
 				.addGroup(groupLayout.createSequentialGroup()
 					.addContainerGap()
-					.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 547, Short.MAX_VALUE)
+					.addComponent(scrollPane)
 					.addContainerGap())
 		);
 		groupLayout.setVerticalGroup(
@@ -66,16 +49,15 @@ public class DialogInfo extends JDialog {
 				.addGroup(groupLayout.createSequentialGroup()
 					.addContainerGap()
 					.addComponent(scrollPane, GroupLayout.PREFERRED_SIZE, 289, GroupLayout.PREFERRED_SIZE)
-					.addGap(52)
-					.addComponent(buttonPane, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addGap(83))
 		);
 		
 		JTextArea txtrInformaesMoverA = new JTextArea();
 		txtrInformaesMoverA.setWrapStyleWord(true);
+		txtrInformaesMoverA.setLineWrap(true);
 		txtrInformaesMoverA.setEditable(false);
 		txtrInformaesMoverA.setTabSize(5);
 		txtrInformaesMoverA.setFont(new Font("Monospaced", Font.BOLD, 16));
-		txtrInformaesMoverA.setLineWrap(true);
 		txtrInformaesMoverA.setText("Informações:\r\n\r\nMover a tela: Para arrastar a tela clique na barra de tarefas do menu onde possui botões como: jogar, modo entre outros, basta clicar e arrastar essa barra que a tela se move;\r\n\r\nRedimensionar a tela: clique no painel do jogo onde as sacolas caem e arraste para redimensionar o tamanho da tela;\r\n\r\n");
 		scrollPane.setViewportView(txtrInformaesMoverA);
 		getContentPane().setLayout(groupLayout);
